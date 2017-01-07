@@ -20,8 +20,8 @@ class Algo:
         for candidate in self.populations:
             distanceTab.append([candidate.getDistance(), candidate])
         #sort tab by distance
-        distanceTabSorted = sorted(distanceTab, key=lambda x: x[0])
-        return distanceTabSorted
+        distanceTabSorted = sorted(distanceTab, key=lambda x: x[0], reverse=True)
+        return [x[1] for x in distanceTabSorted] #return one dimensional array
 
     def selectBest(self, population):
         #select only the x percent best candidate
@@ -41,11 +41,11 @@ class Algo:
             operationsChild1.append(c1.operations[i])#TODO check for error => [operationsChild1.append(c1.operations[i]) AttributeError: 'list' object has no attribute 'operations']
             operationsChild2.append(c2.operations[i])
         for i in range(randomC2ToKeep):
-            operationsChild1.append(c2.operations[i+randomC2ToKeep])
-            operationsChild2.append(c1.operations[i+randomC2ToKeep])
+            operationsChild1.append(c2.operations[i+randomC1ToKeep])
+            operationsChild2.append(c1.operations[i+randomC1ToKeep])
         for i in range(len(c1.operations)):
             if (random.randint(0,100)/100 <= self.percentToMutate):
-                operationsChild1[i] = [random.randint(0, 2), random.randint(0, 360)]
+                operationsChild1[i] = [random.randint(0, 2), random.randint(0, 360)]#create new operation ([0] = motor range(0, 2) --- [1] rotation in degree)
             if (random.randint(0,100)/100 <= self.percentToMutate):
                 operationsChild2[i] = [random.randint(0, 2), random.randint(0, 360)]
         return candidat.Candidat(self.robot, operationsChild1), candidat.Candidat(self.robot, operationsChild2)
@@ -55,15 +55,24 @@ class Algo:
 
     def createNewGeneration(self, population):
         #create child and append child to bestPopulation
-        for i in range(int(self.nbPopulation*(self.percentChildToKeep/2))):
+        nbNewChild = self.nbPopulation - len(population)
+        for i in range(nbNewChild):
             child1, child2 = self.crossOver(self.getRandomCandidate(population), self.getRandomCandidate(population))
             population.append(child1)
-            population.append(child2)
+            if (i+1 < nbNewChild):#append child 2 only if enough space in the population
+                population.append(child2)
         return population
 
     def run(self):
         self.generatePopulation()
         for i in range(self.nbGeneration):
-            self.bestPopulation = self.selectBest(self.executeSequence())
-            self.population = self.createNewGeneration(self.bestPopulation)
-            print (str(i) + " generation")
+            print ("generation " + str(i))
+            bestPopulation = self.selectBest(self.executeSequence())
+            self.populations = self.createNewGeneration(bestPopulation)
+            self.printTabpop()
+
+    def printTabpop(self):
+        tab = []
+        for p in self.populations:
+            tab.append(p.dist)
+        print(tab)
