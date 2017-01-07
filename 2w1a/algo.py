@@ -4,13 +4,12 @@ import numpy
 import matplotlib.pyplot as plt
 
 class Algo:
-    def __init__(self, nbGeneration, nbPopulation, robot, percentBestToKeep=0.8, percentChildToKeep=0.2, percentToMutate=0.01):
+    def __init__(self, nbGeneration, nbPopulation, robot, percentBestToKeep=0.8, percentToMutate=0.01):
         self.robot = robot
         self.nbGeneration = nbGeneration
         self.nbPopulation = nbPopulation
         self.population = []
         self.percentBestToKeep = percentBestToKeep
-        self.percentChildToKeep = percentChildToKeep
         self.percentToMutate = percentToMutate
         self.initGraph()
 
@@ -24,11 +23,12 @@ class Algo:
             distanceTab.append([candidate.getDistance(), candidate])
         #sort tab by distance
         distanceTabSorted = sorted(distanceTab, key=lambda x: x[0], reverse=True)
-        return [x[1] for x in distanceTabSorted] #return one dimensional array
+        return [x[1] for x in distanceTabSorted] #return one dimensional array of candidate
 
     def selectBest(self, population):
         #select only the x percent best candidate
         tab = []
+        print("SELECT BEST : len(population): " + str(len(population)) + "  if range: " + str(int(len(population)*(self.percentBestToKeep))))
         for i in range(int(len(population)*(self.percentBestToKeep))):
             tab.append(population[i])
         return tab
@@ -57,9 +57,10 @@ class Algo:
         return population[random.randint(0, len(population) -1)]
 
     def createNewGeneration(self, population):
-        #create child and append child to bestPopulation
+        #create child and append child to population
         nbNewChild = self.nbPopulation - len(population)
-        for i in range(nbNewChild):
+        print ("population nb: " + str(self.nbPopulation) + " -- len(population): " + str(len(population)) + " -- nbNewChild: " + str(nbNewChild))
+        for i in range(0, nbNewChild, 2):
             child1, child2 = self.crossOver(self.getRandomCandidate(population), self.getRandomCandidate(population))
             population.append(child1)
             if (i+1 < nbNewChild):#append child 2 only if enough space in the population
@@ -93,7 +94,7 @@ class Algo:
     def prepareGraph(self, i, pop):
         self.x.append(i)
 #        self.mean.append(sum(p.dist for p in pop if p.dist > -1)/len(pop))
-        tabDist = [p.dist for p in pop]
+        tabDist = [p.dist for p in pop if p.dist > -1]
         self.mean.append(sum(tabDist)/len(tabDist))
         self.best.append(max(tabDist))
 
