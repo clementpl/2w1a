@@ -1,23 +1,26 @@
 import candidat
 import random
+import numpy
+import matplotlib.pyplot as plt
 
 class Algo:
     def __init__(self, nbGeneration, nbPopulation, robot, percentBestToKeep=0.8, percentChildToKeep=0.2, percentToMutate=0.01):
         self.robot = robot
         self.nbGeneration = nbGeneration
         self.nbPopulation = nbPopulation
-        self.populations = []
+        self.population = []
         self.percentBestToKeep = percentBestToKeep
         self.percentChildToKeep = percentChildToKeep
         self.percentToMutate = percentToMutate
+        self.initGraph()
 
     def generatePopulation(self):
         for i in range(self.nbPopulation):
-            self.populations.append(candidat.Candidat(self.robot))
+            self.population.append(candidat.Candidat(self.robot))
 
     def executeSequence(self):
         distanceTab = []#Array of distance [0] = distance, [1] = candidate
-        for candidate in self.populations:
+        for candidate in self.population:
             distanceTab.append([candidate.getDistance(), candidate])
         #sort tab by distance
         distanceTabSorted = sorted(distanceTab, key=lambda x: x[0], reverse=True)
@@ -68,11 +71,36 @@ class Algo:
         for i in range(self.nbGeneration):
             print ("generation " + str(i))
             bestPopulation = self.selectBest(self.executeSequence())
-            self.populations = self.createNewGeneration(bestPopulation)
+            self.prepareGraph(i, bestPopulation)
+            self.population = self.createNewGeneration(bestPopulation)
             self.printTabpop()
+        self.graphAll()
 
     def printTabpop(self):
         tab = []
-        for p in self.populations:
+        for p in self.population:
             tab.append(p.dist)
         print(tab)
+
+##
+#  Graph function
+##
+    def initGraph(self):
+        self.x = []
+        self.mean = []
+        self.best = []
+
+    def prepareGraph(self, i, pop):
+        self.x.append(i)
+#        self.mean.append(sum(p.dist for p in pop if p.dist > -1)/len(pop))
+        tabDist = [p.dist for p in pop]
+        self.mean.append(sum(tabDist)/len(tabDist))
+        self.best.append(max(tabDist))
+
+    def graphAll(self):
+        plt.plot(numpy.array(self.x), numpy.array(self.mean), label="mean")
+        plt.plot(numpy.array(self.x), numpy.array(self.best), label="max")
+        plt.legend()
+        plt.xlabel("Generation")
+        plt.ylabel("Distance")
+        plt.show()
