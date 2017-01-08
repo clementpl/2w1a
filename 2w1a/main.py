@@ -13,7 +13,7 @@ def main():
     vrep.simxSynchronous(clientID, True)
     if clientID != -1:
         r = robot.Robot(opmode, clientID)
-        algoGen = algo.Algo(50, 25, r)
+        algoGen = algo.Algo(50, 25, r, 0.5, 0.1)
         algoGen.run()
         vrep.simxFinish(clientID)
 
