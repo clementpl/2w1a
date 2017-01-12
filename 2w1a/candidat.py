@@ -26,19 +26,19 @@ class Candidat:
 
     def getDistance(self):
         if (self.dist == -1):
-#            print("start getDistance");
-#            self.robot.setRotation(250.0, "shoulder")
-            vrep.simxSynchronousTrigger(self.robot.clientID)
             vrep.simxStartSimulation(self.robot.clientID, self.robot.opmode)
+            vrep.simxSynchronousTrigger(self.robot.clientID)
             savePos = self.robot.position()
-            saveOrientation = self.robot.orientation()
+            saveOrient = self.robot.orientation()
             for i in range(3):
                 for op in self.operations:
                     self.robot.setRotation(op[1], self.getMotor(op[0]))
-            vrep.simxStopSimulation(self.robot.clientID, self.robot.opmode)
-            newOrientation = self.robot.orientation()
+                    vrep.simxSynchronousTrigger(self.robot.clientID)
+
+            newOrient = self.robot.orientation()
             newPos = self.robot.position()
-            self.dist = self.computeDist(savePos, newPos)
-#            print("dist " + str(self.dist))
-#            print("stop getDistance")
+            vrep.simxStopSimulation(self.robot.clientID, self.robot.opmode)
+            time.sleep(0.1)#wait for end of simxStopSimulation
+            self.distorient = self.computeDist(saveOrient, newOrient)
+            self.dist = self.computeDist(savePos, newPos) - self.computeDist(saveOrient, newOrient)/10
         return self.dist

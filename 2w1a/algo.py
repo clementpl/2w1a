@@ -96,6 +96,9 @@ class Algo:
                 operationsChild.append(c1.operations[i])
             else:
                 operationsChild.append(c2.operations[i])
+            #mutate
+            if (random.randint(0, 100)/100 <= self.percentToMutate):
+                operationsChild[i] = [random.randint(0, 2), random.randint(0, 360)]
         return candidat.Candidat(self.robot, operationsChild)
 
     #take first part of operation from c1 second part from c2 then last part of operations from c1
@@ -109,16 +112,29 @@ class Algo:
                 operationsChild.append(c2.operations[i])
             else:
                 operationsChild.append(c1.operations[i])
+            #mutate
+            if (random.randint(0, 100)/100 <= self.percentToMutate):
+                operationsChild[i] = [random.randint(0, 2), random.randint(0, 360)]
         return candidat.Candidat(self.robot, operationsChild)
 
-    #take random operation between c1 et c2
+    #take random operation between c1 (50%) et c2 (50%)
     def crossOverMulti(self, c1, c2):
+        #create a tab with the 50% of operations of c1 to take
+        randomTab = []
+        while (len(randomTab) < 50):
+            r = random.randint(0, 100)
+            if (r not in randomTab):
+                randomTab.append(r)
+        #affect 50% of c1 operations and 50% of c2 operations
         operationsChild = []
         for i in range(100):#for each operation
-            if (random.randint(0,1) == 0):
+            if (i in randomTab):
                 operationsChild.append(c1.operations[i])
             else:
                 operationsChild.append(c2.operations[i])
+            #mutate
+            if (random.randint(0, 100)/100 <= self.percentToMutate):
+                operationsChild[i] = [random.randint(0, 2), random.randint(0, 360)]
         return candidat.Candidat(self.robot, operationsChild)
 
     #crossover generate 1 child
@@ -126,9 +142,12 @@ class Algo:
         #create child and append child to population
         nbNewChild = self.nbPopulation - len(population)
         for i in range(0, nbNewChild):
-#            child = self.crossOverSimple(self.getRandomCandidate(population), self.getRandomCandidate(population))
-            child = self.crossOverDouble(self.getRandomCandidate(population), self.getRandomCandidate(population))
-#            child = self.crossOverMulti(self.getRandomCandidate(population), self.getRandomCandidate(population))
+            child = None
+            #80%chance to be crossOverDouble, 20% chance to be crossOverMulti
+            if (random.randint(0,4) < 4):
+                child = self.crossOverDouble(self.getRandomCandidate(population), self.getRandomCandidate(population))
+            else:
+                child = self.crossOverMulti(self.getRandomCandidate(population), self.getRandomCandidate(population))
             population.append(child)
         return population
 
