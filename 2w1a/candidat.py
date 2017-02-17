@@ -35,10 +35,10 @@ class Candidat:
                     self.robot.setRotation(op[1], self.getMotor(op[0]))
                     vrep.simxSynchronousTrigger(self.robot.clientID)
 
-            newOrient = self.robot.orientation()
             newPos = self.robot.position()
+            newOrient = self.robot.orientation()
             vrep.simxStopSimulation(self.robot.clientID, self.robot.opmode)
             time.sleep(0.1)#wait for end of simxStopSimulation
-            self.distorient = self.computeDist(saveOrient, newOrient)
-            self.dist = self.computeDist(savePos, newPos) - self.computeDist(saveOrient, newOrient)/10
+            self.dist = self.computeDist(savePos, newPos) - self.computeDist(saveOrient, newOrient)/100
+#            self.dist = self.computeDist(savePos, newPos)
         return self.dist

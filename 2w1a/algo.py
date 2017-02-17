@@ -105,6 +105,10 @@ class Algo:
     def crossOverDouble(self, c1, c2):
         operationsChild = []
         rand = [random.randint(1, 99), random.randint(1, 99)]
+        if (random.randint(0, 1) == 0):
+            tmp = c1
+            c1 = c2
+            c2 = c1
         for i in range(100):#for each operation
             if (i <= min(rand)):
                 operationsChild.append(c1.operations[i])
@@ -143,8 +147,8 @@ class Algo:
         nbNewChild = self.nbPopulation - len(population)
         for i in range(0, nbNewChild):
             child = None
-            #80%chance to be crossOverDouble, 20% chance to be crossOverMulti
-            if (random.randint(0,4) < 4):
+            #90%chance to be crossOverDouble, 10% chance to be crossOverMulti
+            if (random.randint(0,9) < 9):
                 child = self.crossOverDouble(self.getRandomCandidate(population), self.getRandomCandidate(population))
             else:
                 child = self.crossOverMulti(self.getRandomCandidate(population), self.getRandomCandidate(population))
@@ -174,6 +178,7 @@ class Algo:
         self.x = []
         self.mean = []
         self.best = []
+        self.min = []
 
     def prepareGraph(self, i, pop):
         self.x.append(i)
@@ -181,10 +186,12 @@ class Algo:
         tabDist = [p.dist for p in pop if p.dist > -1]
         self.mean.append(sum(tabDist)/len(tabDist))
         self.best.append(max(tabDist))
+        self.min.append(min(tabDist))
 
     def graphAll(self):
         plt.plot(numpy.array(self.x), numpy.array(self.mean), label="mean")
         plt.plot(numpy.array(self.x), numpy.array(self.best), label="max")
+        plt.plot(numpy.array(self.x), numpy.array(self.min), label="min")
         plt.legend()
         plt.xlabel("Generation")
         plt.ylabel("Distance")
